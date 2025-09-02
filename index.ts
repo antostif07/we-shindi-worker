@@ -1,13 +1,19 @@
 import express from "express";
-import { workerLoop } from "./worker"; // ta fonction qui fait polling Redis
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.get("/", (req, res) => res.send("Worker actif !"));
 
-// Démarre le polling Redis
-workerLoop().catch(console.error);
+// Simuler polling Redis en arrière-plan
+async function startWorker() {
+  while (true) {
+    console.log("Polling Redis...");
+    await new Promise(r => setTimeout(r, 5000));
+  }
+}
+
+startWorker().catch(console.error);
 
 app.listen(PORT, () => {
   console.log(`Worker écoute sur le port ${PORT}`);
