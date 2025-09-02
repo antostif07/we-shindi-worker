@@ -5,7 +5,7 @@ const genAI = new GoogleGenAI({
 });
 
 // Exemple : récupération context client
-async function getClientContext(clientId: string) {
+async function getClientContext(clientI) {
   // Ici tu peux récupérer depuis Firestore ou Upstash Redis
   return {
     name: clientId,
@@ -14,7 +14,7 @@ async function getClientContext(clientId: string) {
   };
 }
 
-export async function processMessageAI({ clientId, message, intent }: { clientId: string, message: string, intent: string }) {
+export async function processMessageAI({ clientId, message, intent }) {
   const context = await getClientContext(clientId);
 
   const prompt = `
@@ -26,5 +26,5 @@ Réponds de manière concise et adaptée.
 `;
 
   const response = await genAI.models.generateContent({ model: "gemini-1.5-flash", contents: prompt });
-  return response.text!.trim();
+  return response.text ? response.text.trim() : '';
 }
