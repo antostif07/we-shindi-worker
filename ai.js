@@ -1,11 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 
 const genAI = new GoogleGenAI({
-  apiKey: process.env.GOOGLE_API_KEY!,
+  apiKey: process.env.GOOGLE_API_KEY,
 });
 
 // Exemple : récupération context client
-async function getClientContext(clientI) {
+async function getClientContext(clientId) {
   // Ici tu peux récupérer depuis Firestore ou Upstash Redis
   return {
     name: clientId,

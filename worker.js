@@ -1,6 +1,6 @@
 import { Redis } from "@upstash/redis";
 import fetch from "node-fetch";
-import { processMessageAI } from "./ai";
+import { processMessageAI } from "./ai.js";
 
 const redis = Redis.fromEnv();
 
@@ -9,8 +9,9 @@ export async function workerLoop() {
 
   while (true) {
     const taskJson = await redis.rpop("queue:tasks"); // récupère le dernier job
+    
     if (taskJson) {
-      const { clientId, message, from, intent } = JSON.parse(taskJson);
+      const { clientId, message, from, intent } = taskJson;
       console.log("📩 Traitement message:", { clientId, message, intent });
 
       const result = await processMessageAI({ clientId, message, intent });
