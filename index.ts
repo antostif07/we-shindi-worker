@@ -1,32 +1,14 @@
-import { Redis } from "@upstash/redis";
-import fetch from "node-fetch";
-import { processMessageAI } from "./ai";
+import express from "express";
+import { workerLoop } from "./worker"; // ta fonction qui fait polling Redis
 
-const redis = Redis.fromEnv();
+const app = express();
+const PORT = process.env.PORT || 8080;
 
-async function workerLoop() {
-  console.log("Worker démarré...");
+app.get("/", (req, res) => res.send("Worker actif !"));
 
-  while (true) {
-    const taskJson = await redis.rpop("queue:tasks"); // récupère le dernier job
-    if (taskJson) {
-      const { clientId, message, from, intent } = JSON.parse(taskJson);
-      console.log("📩 Traitement message:", { clientId, message, intent });
-
-      const result = await processMessageAI({ clientId, message, intent });
-
-      await fetch(`${process.env.BACKEND_URL}/api/worker-result`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clientId, from, result }),
-      });
-
-      console.log("✅ Job traité pour client:", clientId);
-    } else {
-      // Pas de job, attendre quelques secondes avant de vérifier à nouveau
-      await new Promise(res => setTimeout(res, 2000));
-    }
-  }
-}
-
+// Démarre le polling Redis
 workerLoop().catch(console.error);
+
+app.listen(PORT, () => {
+  console.log(`Worker écoute sur le port ${PORT}`);
+});
